@@ -1,15 +1,11 @@
 package org.jboss.ejb.client.remoting;
 
-import java.io.IOException;
-
-import org.jboss.remoting3.Attachments;
-import org.jboss.remoting3.Channel;
-import org.jboss.remoting3.CloseHandler;
-import org.jboss.remoting3.Connection;
-import org.jboss.remoting3.MessageOutputStream;
+import org.jboss.remoting3.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xnio.Option;
+
+import java.io.IOException;
 
 /**
  * @author Tomas Hofman (thofman@redhat.com)
@@ -36,7 +32,7 @@ public class ChannelAssociationTestCase {
         Assert.assertEquals(3, channelAssociation.getNextInvocationId());
     }
 
-    private static class ChannelStub implements Channel {
+    public static class ChannelStub implements Channel {
 
         @Override
         public Connection getConnection() {

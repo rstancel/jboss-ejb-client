@@ -22,29 +22,21 @@
 
 package org.jboss.ejb.client.remoting;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.concurrent.Future;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.jboss.ejb.client.EJBClientContext;
 import org.jboss.ejb.client.EJBReceiverContext;
 import org.jboss.ejb.client.EJBReceiverInvocationContext;
 import org.jboss.ejb.client.Logs;
 import org.jboss.logging.Logger;
 import org.jboss.marshalling.MarshallerFactory;
-import org.jboss.remoting3.Channel;
-import org.jboss.remoting3.CloseHandler;
-import org.jboss.remoting3.MessageInputStream;
-import org.jboss.remoting3.MessageOutputStream;
-import org.jboss.remoting3.RemotingOptions;
+import org.jboss.remoting3.*;
 import org.xnio.FutureResult;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A {@link ChannelAssociation} keeps track of the association between the {@link EJBReceiverContext}
@@ -56,7 +48,7 @@ import org.xnio.FutureResult;
  * <p/>
  * User: Jaikiran Pai
  */
-class ChannelAssociation {
+public class ChannelAssociation {
 
     private static final Logger logger = Logger.getLogger(ChannelAssociation.class);
 
@@ -97,9 +89,9 @@ class ChannelAssociation {
      * @param marshallerFactory  The marshalling factory
      * @param reconnectHandler   The reconnect handler to use for broken connections/channels. Can be null.
      */
-    ChannelAssociation(final RemotingConnectionEJBReceiver ejbReceiver, final EJBReceiverContext ejbReceiverContext,
-                       final Channel channel, final byte protocolVersion, final MarshallerFactory marshallerFactory,
-                       final ReconnectHandler reconnectHandler) {
+    public ChannelAssociation(final RemotingConnectionEJBReceiver ejbReceiver, final EJBReceiverContext ejbReceiverContext,
+            final Channel channel, final byte protocolVersion, final MarshallerFactory marshallerFactory,
+            final ReconnectHandler reconnectHandler) {
         this.ejbReceiver = ejbReceiver;
         this.ejbReceiverContext = ejbReceiverContext;
         this.channel = channel;
@@ -266,7 +258,7 @@ class ChannelAssociation {
      * @return
      * @throws Exception
      */
-    MessageOutputStream acquireChannelMessageOutputStream() throws Exception {
+    public MessageOutputStream acquireChannelMessageOutputStream() throws Exception {
         this.channelWriteSemaphore.acquire();
         try {
             return this.channel.writeMessage();

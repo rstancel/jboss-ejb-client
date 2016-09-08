@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
 
-class DummyConnection implements Connection {
+public class DummyConnection implements Connection {
 	private final String ENDPOINT_NAME = "Remote endpoint name";
 
 	@Override

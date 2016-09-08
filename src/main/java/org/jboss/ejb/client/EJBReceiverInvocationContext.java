@@ -27,7 +27,7 @@ package org.jboss.ejb.client;
  *
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  */
-public final class EJBReceiverInvocationContext {
+public class EJBReceiverInvocationContext {
     private final EJBClientInvocationContext clientInvocationContext;
     private final EJBReceiverContext ejbReceiverContext;
 

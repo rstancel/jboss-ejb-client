@@ -1293,11 +1293,11 @@ public final class EJBClientContext extends Attachable implements Closeable {
         void receiverContextClosed(final EJBReceiverContext receiverContext);
     }
 
-    private static final class ReceiverAssociation {
+    static final class ReceiverAssociation {
         final EJBReceiverContext context;
         boolean associated = false;
 
-        private ReceiverAssociation(final EJBReceiverContext context) {
+        ReceiverAssociation(final EJBReceiverContext context) {
             this.context = context;
         }
     }
