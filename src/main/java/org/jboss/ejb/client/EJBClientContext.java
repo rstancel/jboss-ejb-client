@@ -24,20 +24,7 @@ package org.jboss.ejb.client;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ServiceLoader;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -150,6 +137,11 @@ public final class EJBClientContext extends Attachable implements Closeable {
             logger.debug("Failed to load EJB client interceptor(s) from the classpath via classloader " + classLoader + " for EJB client context " + this, t);
         }
 
+    }
+
+    private void initReconnectionCheckerTimer() {
+        Timer timer = new Timer(true);
+        timer.scheduleAtFixedRate(new ReconnectionTimerTask (), 0, 300000 );
     }
 
     /**
@@ -849,7 +841,7 @@ public final class EJBClientContext extends Attachable implements Closeable {
     }
 
     /**
-     * Returns a {@link eJBReceiverContext} for the passed <code>receiver</code>. If the <code>receiver</code>
+     * Returns a {@link EJBReceiverContext} for the passed <code>receiver</code>. If the <code>receiver</code>
      * hasn't been registered with this {@link EJBClientContext}, either through a call to {@link #registerConnection(org.jboss.remoting3.Connection)}
      * or to {@link #requireEJBReceiver(String, String, String)}, then this method throws an {@link IllegalStateException}
      * <p/>
@@ -1432,6 +1424,13 @@ public final class EJBClientContext extends Attachable implements Closeable {
             } finally {
                 this.taskCompletionNotifierLatch.countDown();
             }
+        }
+    }
+
+    private class ReconnectionTimerTask extends TimerTask {
+        @Override
+        public void run() {
+
         }
     }
 }
