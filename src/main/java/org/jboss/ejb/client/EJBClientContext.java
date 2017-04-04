@@ -22,6 +22,12 @@
 
 package org.jboss.ejb.client;
 
+import org.jboss.ejb.client.remoting.ConfigBasedEJBClientContextSelector;
+import org.jboss.ejb.client.remoting.ReconnectHandler;
+import org.jboss.ejb.client.remoting.RemotingConnectionEJBReceiver;
+import org.jboss.logging.Logger;
+import org.jboss.remoting3.Connection;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,6 +44,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,12 +55,6 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.jboss.ejb.client.remoting.ConfigBasedEJBClientContextSelector;
-import org.jboss.ejb.client.remoting.ReconnectHandler;
-import org.jboss.ejb.client.remoting.RemotingConnectionEJBReceiver;
-import org.jboss.logging.Logger;
-import org.jboss.remoting3.Connection;
 
 /**
  * The public API for an EJB client context.  An EJB client context may be associated with (and used by) one or more threads concurrently.
@@ -115,6 +117,8 @@ public final class EJBClientContext extends Attachable implements Closeable {
     private final Lock reconnectCompletedLock = new ReentrantLock();
     private final Condition reconnectCompletedCondition = reconnectCompletedLock.newCondition();
 
+    private Timer reconnectionCheckerTimer;
+
     private EJBClientContext(final EJBClientConfiguration ejbClientConfiguration) {
         this.ejbClientConfiguration = ejbClientConfiguration;
         if (ejbClientConfiguration != null && ejbClientConfiguration.getDeploymentNodeSelector() != null) {
@@ -149,6 +153,8 @@ public final class EJBClientContext extends Attachable implements Closeable {
             // just log a message and don't cause the application to fail, perhaps due to a rogue library in the classpath
             logger.debug("Failed to load EJB client interceptor(s) from the classpath via classloader " + classLoader + " for EJB client context " + this, t);
         }
+
+        initReconnectionCheckerTimer();
 
     }
 
@@ -849,7 +855,7 @@ public final class EJBClientContext extends Attachable implements Closeable {
     }
 
     /**
-     * Returns a {@link eJBReceiverContext} for the passed <code>receiver</code>. If the <code>receiver</code>
+     * Returns a {@link EJBReceiverContext} for the passed <code>receiver</code>. If the <code>receiver</code>
      * hasn't been registered with this {@link EJBClientContext}, either through a call to {@link #registerConnection(org.jboss.remoting3.Connection)}
      * or to {@link #requireEJBReceiver(String, String, String)}, then this method throws an {@link IllegalStateException}
      * <p/>
@@ -1433,5 +1439,16 @@ public final class EJBClientContext extends Attachable implements Closeable {
                 this.taskCompletionNotifierLatch.countDown();
             }
         }
+    }
+
+    private void initReconnectionCheckerTimer() {
+        reconnectionCheckerTimer = new Timer("EJBReconnectionTimer");
+        long seconds = 180;
+        reconnectionCheckerTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                attemptReconnections();
+            }
+        }, seconds * 1000);
     }
 }
