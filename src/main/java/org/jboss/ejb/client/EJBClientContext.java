@@ -22,30 +22,9 @@
 
 package org.jboss.ejb.client;
 
-import org.jboss.ejb.client.remoting.ConfigBasedEJBClientContextSelector;
-import org.jboss.ejb.client.remoting.ReconnectHandler;
-import org.jboss.ejb.client.remoting.RemotingConnectionEJBReceiver;
-import org.jboss.logging.Logger;
-import org.jboss.remoting3.Connection;
-
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,6 +34,12 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.jboss.ejb.client.remoting.ConfigBasedEJBClientContextSelector;
+import org.jboss.ejb.client.remoting.ReconnectHandler;
+import org.jboss.ejb.client.remoting.RemotingConnectionEJBReceiver;
+import org.jboss.logging.Logger;
+import org.jboss.remoting3.Connection;
 
 /**
  * The public API for an EJB client context.  An EJB client context may be associated with (and used by) one or more threads concurrently.
